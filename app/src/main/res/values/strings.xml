@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">EcoWarrior</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="add_trip_title">Add Trip</string>
+    <string name="action_settings">Settings</string>
+
+    <!--Add Trip Strings-->
+    <string name="add_trip">Add Trip</string>
+    <string name="prompt_odometer_reading">Odometer Reading</string>
+    <string name="prompt_trip_distance">Trip Distance</string>
+    <string name="prompt_gallons">Gallons Filled</string>
+    <string name="prompt_octane">Fuel Octane</string>
+    <string name="prompt_fuel_brand">Fuel Brand</string>
+    <string name="prompt_fuel_price">Fuel Price</string>
+</resources>
