@@ -1,14 +1,17 @@
 package com.ragnardev.ecowarrior.Controller;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Toast;
 
 import com.ragnardev.ecowarrior.Model.Vehicle;
 import com.ragnardev.ecowarrior.R;
@@ -19,6 +22,7 @@ import com.ragnardev.ecowarrior.R;
 
 public class AddTripFragment extends DialogFragment
 {
+    private static final String TAG = "AddTripFragment";
     private static final String ARG_VEHICLE = "currentvehiclearg";
 
     private Dialog mDialog;
@@ -63,7 +67,7 @@ public class AddTripFragment extends DialogFragment
         mTripDistance.addTextChangedListener(new GenericTextWatcher(mTripDistance));
 
         mFuelOctane = (TextInputEditText) v.findViewById(R.id.fuel_octane);
-        mFuelOctane.addTextChangedListener(new GenericTextWatcher(mFuelBrand));
+        mFuelOctane.addTextChangedListener(new GenericTextWatcher(mFuelOctane));
 
         mFuelBrand = (TextInputEditText) v.findViewById(R.id.fuel_brand);
         mFuelBrand.addTextChangedListener(new GenericTextWatcher(mFuelBrand));
@@ -77,12 +81,25 @@ public class AddTripFragment extends DialogFragment
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
         dialogBuilder.setView(v);
         dialogBuilder.setTitle(R.string.add_trip_title);
-        dialogBuilder.setPositiveButton(R.string.add_trip, null);
-        //dialogBuilder.setNegativeButton(android.R.string.cancel, null);
+        dialogBuilder.setPositiveButton(R.string.add_trip, new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                addNewFillUpData();
+            }
+        });
+        dialogBuilder.setNegativeButton(android.R.string.cancel, null);
         mDialog = dialogBuilder.create();
         mDialog.setCanceledOnTouchOutside(false);
 
         return mDialog;
+    }
+
+    private void addNewFillUpData()
+    {
+        mVehicle.addNewFillupData(this.tripDistance, this.gallonsFilled);
+        Toast.makeText(getContext(), "Trip added to " + mVehicle.getVehicleId(), Toast.LENGTH_SHORT).show();
     }
 
     private void enableConfirmationIfReady()
@@ -116,22 +133,40 @@ public class AddTripFragment extends DialogFragment
         public void afterTextChanged(Editable editable)
         {
             String text = editable.toString();
-            //TODO: fix the null errors when converting to numbers
+
             switch(view.getId())
             {
                 case R.id.odometer_reading:
-                    odometer = Integer.parseInt(mOdometerReading.getText().toString());
-                    mVehicle.setOdometer(odometer);
+                    if(text.length() == 0) odometer = 0;
+                    else
+                    {
+                        odometer = Integer.parseInt(text);
+                        mVehicle.setOdometer(odometer);
+                    }
+                    break;
                 case R.id.trip_distance:
-                    tripDistance = Double.parseDouble(mTripDistance.getText().toString());
+                    if(text.length() == 0) tripDistance = 0;
+                    else tripDistance = Double.parseDouble(text);
+                    break;
                 case R.id.fuel_octane:
-                    fuelOctane = Integer.parseInt(mOdometerReading.getText().toString());
+                    if(text.length() == 0) fuelOctane = 0;
+                    else fuelOctane = Integer.parseInt(text);
+                    break;
                 case R.id.fuel_brand:
-                    fuelBrand = mFuelBrand.getText().toString();
+                    if(text.length() == 0) fuelBrand = null;
+                    else fuelBrand = text;
+                    break;
                 case R.id.fuel_price:
-                    fuelPrice = Double.parseDouble(mOdometerReading.getText().toString());
+                    if(text.length() == 0) fuelPrice = 0;
+                    else fuelPrice = Double.parseDouble(text);
+                    break;
                 case R.id.gallons_filled:
-                    gallonsFilled = Double.parseDouble(mGallonsFilled.getText().toString());
+                    if(text.length() == 0) gallonsFilled = 0;
+                    else gallonsFilled = Double.parseDouble(text);
+                    break;
+                default:
+                    Log.e(TAG, "View not found");
+                    break;
             }
             enableConfirmationIfReady();
         }
