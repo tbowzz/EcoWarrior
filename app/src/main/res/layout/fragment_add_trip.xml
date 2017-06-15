@@ -17,7 +17,8 @@
             android:maxLines="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/prompt_odometer_reading"/>
+            android:hint="@string/prompt_odometer_reading"
+            android:imeOptions="actionNext"/>
 
     </android.support.design.widget.TextInputLayout>
 
@@ -33,7 +34,8 @@
             android:maxLines="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/prompt_trip_distance"/>
+            android:hint="@string/prompt_trip_distance"
+            android:imeOptions="actionNext"/>
 
     </android.support.design.widget.TextInputLayout>
 
@@ -49,7 +51,8 @@
             android:maxLines="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/prompt_octane"/>
+            android:hint="@string/prompt_octane"
+            android:imeOptions="actionNext"/>
 
     </android.support.design.widget.TextInputLayout>
 
@@ -64,7 +67,8 @@
             android:maxLines="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/prompt_fuel_brand"/>
+            android:hint="@string/prompt_fuel_brand"
+            android:imeOptions="actionNext"/>
 
     </android.support.design.widget.TextInputLayout>
 
@@ -80,7 +84,8 @@
             android:maxLines="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/prompt_fuel_price"/>
+            android:hint="@string/prompt_fuel_price"
+            android:imeOptions="actionNext"/>
 
     </android.support.design.widget.TextInputLayout>
 
@@ -96,7 +101,8 @@
             android:maxLines="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/prompt_gallons"/>
+            android:hint="@string/prompt_gallons"
+            android:imeOptions="actionDone"/>
 
     </android.support.design.widget.TextInputLayout>
 

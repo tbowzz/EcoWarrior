@@ -1,4 +1,4 @@
-package com.ragnardev.ecowarrior.Controller;
+package com.ragnardev.ecowarrior.View;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
