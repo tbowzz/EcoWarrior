@@ -6,10 +6,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.ragnardev.ecowarrior.Model.Data;
+import com.ragnardev.ecowarrior.Model.ClientModel;
+import com.ragnardev.ecowarrior.Persistence.Firebase.FirebasePersistence;
 import com.ragnardev.ecowarrior.R;
 
 /**
@@ -30,7 +29,7 @@ public class SettingsActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-                Data.SINGLETON.pullFromFirebase();
+                new FirebasePersistence().updateClientModel();
                 Snackbar.make(pullButton, "Pulled from Database", Snackbar.LENGTH_SHORT).show();
             }
         });
@@ -41,7 +40,7 @@ public class SettingsActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-                Data.SINGLETON.pushToFirebase();
+                new FirebasePersistence().updateServer();
                 Snackbar.make(pushButton, "Pushed to Database", Snackbar.LENGTH_SHORT).show();
             }
         });

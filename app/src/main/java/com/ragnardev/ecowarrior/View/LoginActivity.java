@@ -32,11 +32,17 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.ragnardev.ecowarrior.Model.Data;
+import com.ragnardev.ecowarrior.Model.ClientModel;
+import com.ragnardev.ecowarrior.Persistence.Firebase.FirebasePersistence;
+import com.ragnardev.ecowarrior.Persistence.IPersistence;
 import com.ragnardev.ecowarrior.R;
 
+import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
+
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener,
-        View.OnClickListener
+        View.OnClickListener, Observer
 {
     private static final String TAG = "LoginActivity";
     private static final int RC_SIGN_IN = 9001;
@@ -49,8 +55,12 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private TextView mDetailTextView;
 
     SignInButton mSignInButton;
-
     Button optionalButton;
+
+    public LoginActivity()
+    {
+        ClientModel.SINGLETON.addObserver(this);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -155,9 +165,14 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
+
                             FirebaseUser user = mAuth.getCurrentUser();
-                            Data.SINGLETON.setCurrentUser(user);
-                            startNextActivity();
+                            ClientModel.SINGLETON.setCurrentUser(user);
+
+                            IPersistence persistence = new FirebasePersistence();
+                            persistence.updateClientModel();
+
+//                            startNextActivity();
                             updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
@@ -172,26 +187,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                         // [END_EXCLUDE]
                     }
                 });
-    }
-
-    private void startNextActivity()
-    {
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot)
-            {
-                Data.SINGLETON.initializeModel(dataSnapshot);
-                Intent intent = TripsActivity.newIntent(getApplicationContext());
-                startActivity(intent);
-                optionalButton.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                System.out.println("The read failed: " + databaseError.getCode());
-            }
-        });
     }
 
     private void signIn()
@@ -245,8 +240,9 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 //            mStatusTextView.setText(getString(R.string.google_status_fmt, user.getDisplayName()));
 //            mDetailTextView.setText(getString(R.string.firebase_status_fmt, user.getUid()));
             findViewById(R.id.sign_in_button).setVisibility(View.GONE);
-            findViewById(R.id.sign_out_and_disconnect).setVisibility(View.VISIBLE);
+            findViewById(R.id.sign_out_and_disconnect).setVisibility(View.INVISIBLE);
             optionalButton.setText(getString(R.string.welcome_user_fmt, user.getDisplayName()));
+            optionalButton.setVisibility(View.VISIBLE);
         } else {
 //            mStatusTextView.setText(R.string.signed_out);
 //            mDetailTextView.setText(null);
@@ -263,5 +259,25 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         // be available.
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
         Toast.makeText(this, "Google Play Services error.", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void update(Observable o, Object arg)
+    {
+        if(arg.getClass() == ArrayList.class)
+        {
+            ClientModel.SINGLETON.deleteObserver(this);
+            Intent intent = TripsActivity.newIntent(getApplicationContext());
+            startActivity(intent);
+            finish();
+        }
+        else if(arg.getClass() == Boolean.class)
+        {
+            boolean success = (Boolean) arg;
+            if(!success)
+            {
+                updateUI(null);
+            }
+        }
     }
 }

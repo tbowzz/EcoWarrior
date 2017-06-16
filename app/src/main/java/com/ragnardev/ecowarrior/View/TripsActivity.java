@@ -2,10 +2,8 @@ package com.ragnardev.ecowarrior.View;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Icon;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -27,8 +25,7 @@ import android.widget.Toast;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.google.firebase.auth.FirebaseAuth;
-import com.joanzapata.iconify.IconDrawable;
-import com.ragnardev.ecowarrior.Model.Data;
+import com.ragnardev.ecowarrior.Model.ClientModel;
 import com.ragnardev.ecowarrior.Model.Trip;
 import com.ragnardev.ecowarrior.Model.Vehicle;
 import com.ragnardev.ecowarrior.R;
@@ -41,8 +38,12 @@ import java.util.List;
 public class TripsActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener
 {
+    private TripsPresenter presenter;
+
     private static final String DIALOG_TRIP = "DialogTrip";
     private static final String DIALOG_VEHICLE = "DialogVehicle";
+
+    private Toolbar mToolbar;
 
     private FloatingActionButton mAddTripButton;
     private FloatingActionButton mAddVehicleButton;
@@ -66,18 +67,12 @@ public class TripsActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        //TODO: If no vehicle, prompt for creation
-        if(Data.SINGLETON.getVehicles().size() == 0)
-        {
-            Toast.makeText(this, "Since you have no vehicles, you must add one.", Toast.LENGTH_LONG).show();
-            showAddVehicleDialog();
-        }
-        currentVehicle = Data.SINGLETON.getVehicles().get(0);
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trips);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+
+        presenter = new TripsPresenter(this);
 
         mAddMenu = (FloatingActionsMenu) findViewById(R.id.add_menu);
         mAddMenu.setOnLongClickListener(new View.OnLongClickListener()
@@ -116,15 +111,31 @@ public class TripsActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        //TODO: If no vehicle, prompt for creation
+        if(ClientModel.SINGLETON.getVehicles().size() == 0)
+        {
+            Toast.makeText(this, "Since you have no vehicles, you must add one.", Toast.LENGTH_LONG).show();
+            showAddVehicleDialog();
+        }
+        else
+        {
+            initializeRecyclers();
+        }
+    }
+
+    void initializeRecyclers()
+    {
+        currentVehicle = ClientModel.SINGLETON.getVehicles().get(0);
+
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         mToggle = new ActionBarDrawerToggle(
-                this, mDrawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         mDrawer.setDrawerListener(mToggle);
         mToggle.syncState();
 
         vehicleRecyler = (RecyclerView) findViewById(R.id.left_drawer);
         vehicleRecyler.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
-        vehicleRecyler.setAdapter(new VehicleAdapter(Data.SINGLETON.getVehicles()));
+        vehicleRecyler.setAdapter(new VehicleAdapter(ClientModel.SINGLETON.getVehicles()));
 
 
         LinearLayoutManager tripsLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, true);
@@ -201,7 +212,7 @@ public class TripsActivity extends AppCompatActivity
         public void onClick(View v)
         {
             Toast.makeText(getApplicationContext(), "Vehicle " + vehicleId.getText() + " selected", Toast.LENGTH_SHORT).show();
-            setCurrentVehicle(Data.SINGLETON.getVehicleById(vehicleId.getText().toString()));
+            setCurrentVehicle(ClientModel.SINGLETON.getVehicleById(vehicleId.getText().toString()));
             mTripsAdapter.setRecordedTrips(currentVehicle.getRecordedTrips());
             if(mTripsAdapter.getRecordedTrips() == null) mTripsAdapter.setRecordedTrips(new ArrayList<Trip>());
             mTripsAdapter.notifyDataSetChanged();

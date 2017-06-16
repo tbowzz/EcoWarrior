@@ -13,9 +13,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
 
-import com.ragnardev.ecowarrior.Model.Data;
+import com.ragnardev.ecowarrior.Model.ClientModel;
 import com.ragnardev.ecowarrior.Model.Trip;
 import com.ragnardev.ecowarrior.Model.Vehicle;
+import com.ragnardev.ecowarrior.Persistence.Firebase.FirebasePersistence;
 import com.ragnardev.ecowarrior.R;
 
 import java.text.DecimalFormat;
@@ -129,19 +130,19 @@ public class AddTripFragment extends DialogFragment
     private void addNewTrip()
     {
         Trip newTrip = new Trip(odometer, tripDistance, fuelOctane, fuelBrand, fuelPrice, gallonsFilled);
-        Data.SINGLETON.getVehicleById(mVehicle.getVehicleId()).addTrip(newTrip);
-        Data.SINGLETON.getVehicleById(mVehicle.getVehicleId()).addNewFillupData(this.tripDistance, this.gallonsFilled);
+        ClientModel.SINGLETON.getVehicleById(mVehicle.getVehicleId()).addTrip(newTrip);
+        ClientModel.SINGLETON.getVehicleById(mVehicle.getVehicleId()).addNewFillupData(this.tripDistance, this.gallonsFilled);
 
         Toast.makeText(getContext(), "Trip added to " + mVehicle.getVehicleId(), Toast.LENGTH_SHORT).show();
 
-        Data.SINGLETON.pushToFirebase();
+        new FirebasePersistence().updateServer();
 
         ((TripsActivity)getActivity()).updateTripsView();
     }
 
     private void saveEditedTrip()
     {
-        Vehicle vehicle = Data.SINGLETON.getVehicleById(mVehicleID);
+        Vehicle vehicle = ClientModel.SINGLETON.getVehicleById(mVehicleID);
         vehicle.getTripByOdo(mOriginalOdo).setBrand(fuelBrand);
         vehicle.getTripByOdo(mOriginalOdo).setOctane(fuelOctane);
         vehicle.getTripByOdo(mOriginalOdo).setOdometer(odometer);
@@ -154,7 +155,7 @@ public class AddTripFragment extends DialogFragment
 
         Toast.makeText(getContext(), "Trip edited for " + mVehicleID, Toast.LENGTH_SHORT).show();
 
-        Data.SINGLETON.pushToFirebase();
+        new FirebasePersistence().updateServer();
 
         ((TripsActivity)getActivity()).updateTripsView();
     }

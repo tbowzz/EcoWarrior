@@ -13,8 +13,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
 
-import com.ragnardev.ecowarrior.Model.Data;
+import com.ragnardev.ecowarrior.Model.ClientModel;
 import com.ragnardev.ecowarrior.Model.Vehicle;
+import com.ragnardev.ecowarrior.Persistence.Firebase.FirebasePersistence;
 import com.ragnardev.ecowarrior.R;
 
 /**
@@ -99,13 +100,18 @@ public class AddVehicleFragment extends DialogFragment
     private void addNewVehicle()
     {
         Vehicle vehicle = new Vehicle(vehicleId, Integer.parseInt(odometer), 0, 0, Double.parseDouble(epaEstimate));
-        Data.SINGLETON.addVehicle(vehicle);
+        ClientModel.SINGLETON.addVehicle(vehicle);
 
         Toast.makeText(getActivity().getApplicationContext(), vehicleId + " added!", Toast.LENGTH_SHORT).show();
 
-        Data.SINGLETON.pushToFirebase();
+        if(ClientModel.SINGLETON.getVehicles().size() == 1)
+        {
+            ((TripsActivity)getActivity()).initializeRecyclers();
+        }
 
         ((TripsActivity)getActivity()).updateTripsView();
+
+        new FirebasePersistence().updateServer();
     }
 
     private void saveEditedVehicle()
