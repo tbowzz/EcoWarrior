@@ -2,6 +2,7 @@ package com.ragnardev.ecowarrior.View;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Icon;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -26,6 +27,7 @@ import android.widget.Toast;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.google.firebase.auth.FirebaseAuth;
+import com.joanzapata.iconify.IconDrawable;
 import com.ragnardev.ecowarrior.Model.Data;
 import com.ragnardev.ecowarrior.Model.Trip;
 import com.ragnardev.ecowarrior.Model.Vehicle;
@@ -36,10 +38,11 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity
+public class TripsActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener
 {
     private static final String DIALOG_TRIP = "DialogTrip";
+    private static final String DIALOG_VEHICLE = "DialogVehicle";
 
     private FloatingActionButton mAddTripButton;
     private FloatingActionButton mAddVehicleButton;
@@ -56,7 +59,7 @@ public class MainActivity extends AppCompatActivity
 
     public static Intent newIntent(Context packageContext)
     {
-        Intent i = new Intent(packageContext, MainActivity.class);
+        Intent i = new Intent(packageContext, TripsActivity.class);
         return i;
     }
 
@@ -64,16 +67,31 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         //TODO: If no vehicle, prompt for creation
-        currentVehicle = Data.Instance.getVehicles().get(0);
+        if(Data.SINGLETON.getVehicles().size() == 0)
+        {
+            Toast.makeText(this, "Since you have no vehicles, you must add one.", Toast.LENGTH_LONG).show();
+            showAddVehicleDialog();
+        }
+        currentVehicle = Data.SINGLETON.getVehicles().get(0);
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_trips);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         mAddMenu = (FloatingActionsMenu) findViewById(R.id.add_menu);
+        mAddMenu.setOnLongClickListener(new View.OnLongClickListener()
+        {
+            @Override
+            public boolean onLongClick(View v)
+            {
+                showAddTripDialog();
+                return false;
+            }
+        });
 
         mAddTripButton = (FloatingActionButton) findViewById(R.id.add_trip_button);
+        mAddTripButton.setImageResource(R.drawable.gas_icon);
         mAddTripButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -84,12 +102,14 @@ public class MainActivity extends AppCompatActivity
         });
 
         mAddVehicleButton = (FloatingActionButton) findViewById(R.id.add_vehicle_button);
+        mAddVehicleButton.setImageResource(R.drawable.vehicle_icon);
         mAddVehicleButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View view)
             {
-                Snackbar.make(view, "Replace with AddVehicleActivity", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                showAddVehicleDialog();
+//                Snackbar.make(view, "Replace with AddVehicleActivity", Snackbar.LENGTH_LONG).setAction("Action", null).show();
             }
         });
 
@@ -104,7 +124,7 @@ public class MainActivity extends AppCompatActivity
 
         vehicleRecyler = (RecyclerView) findViewById(R.id.left_drawer);
         vehicleRecyler.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
-        vehicleRecyler.setAdapter(new VehicleAdapter(Data.Instance.getVehicles()));
+        vehicleRecyler.setAdapter(new VehicleAdapter(Data.SINGLETON.getVehicles()));
 
 
         LinearLayoutManager tripsLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, true);
@@ -118,7 +138,6 @@ public class MainActivity extends AppCompatActivity
         }
         mTripsAdapter = new TripsAdapter(currentVehicle.getRecordedTrips());
         tripsRecycler.setAdapter(mTripsAdapter);
-//        updateTripsView();
     }
 
     public void updateTripsView()
@@ -182,8 +201,9 @@ public class MainActivity extends AppCompatActivity
         public void onClick(View v)
         {
             Toast.makeText(getApplicationContext(), "Vehicle " + vehicleId.getText() + " selected", Toast.LENGTH_SHORT).show();
-            setCurrentVehicle(Data.Instance.getVehicleById(vehicleId.getText().toString()));
+            setCurrentVehicle(Data.SINGLETON.getVehicleById(vehicleId.getText().toString()));
             mTripsAdapter.setRecordedTrips(currentVehicle.getRecordedTrips());
+            if(mTripsAdapter.getRecordedTrips() == null) mTripsAdapter.setRecordedTrips(new ArrayList<Trip>());
             mTripsAdapter.notifyDataSetChanged();
             mDrawer.closeDrawer(GravityCompat.START);
         }
@@ -346,6 +366,20 @@ public class MainActivity extends AppCompatActivity
         FragmentManager manager = getSupportFragmentManager();
         AddTripFragment dialog = AddTripFragment.newInstance(trip, currentVehicle.getVehicleId());
         dialog.show(manager, DIALOG_TRIP);
+    }
+
+    void showAddVehicleDialog()
+    {
+        FragmentManager manager = getSupportFragmentManager();
+        AddVehicleFragment dialog = AddVehicleFragment.newInstance();
+        dialog.show(manager, DIALOG_VEHICLE);
+    }
+
+    void showEditVehicleDialog(Vehicle vehicle)
+    {
+        FragmentManager manager = getSupportFragmentManager();
+        AddVehicleFragment dialog = AddVehicleFragment.newInstance(vehicle);
+        dialog.show(manager, DIALOG_VEHICLE);
     }
 
     @Override

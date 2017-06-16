@@ -1,11 +1,15 @@
 package com.ragnardev.ecowarrior.View;
 
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ragnardev.ecowarrior.Model.Data;
 import com.ragnardev.ecowarrior.R;
 
 /**
@@ -20,8 +24,29 @@ public class SettingsActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        TextView helloWorld = (TextView) findViewById(R.id.hello_world_view);
-        Toast.makeText(this, "Welcome to SettingsActivity", Toast.LENGTH_SHORT).show();
+        final Button pullButton = (Button) findViewById(R.id.pull_button);
+        pullButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Data.SINGLETON.pullFromFirebase();
+                Snackbar.make(pullButton, "Pulled from Database", Snackbar.LENGTH_SHORT).show();
+            }
+        });
+
+        final Button pushButton = (Button) findViewById(R.id.push_button);
+        pushButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Data.SINGLETON.pushToFirebase();
+                Snackbar.make(pushButton, "Pushed to Database", Snackbar.LENGTH_SHORT).show();
+            }
+        });
+
+//        Toast.makeText(this, "Welcome to SettingsActivity", Toast.LENGTH_SHORT).show();
     }
 
 //    @Override

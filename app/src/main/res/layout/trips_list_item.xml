@@ -12,7 +12,8 @@
         android:layout_gravity="center"
         android:layout_margin="4dp"
         card_view:cardCornerRadius="4dp"
-        card_view:cardElevation="4dp">
+        card_view:cardElevation="4dp"
+        android:background="?android:attr/selectableItemBackground">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -27,17 +28,20 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    style="@style/AppText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Fuel: "/>
 
                 <TextView
+                    style="@style/AppText"
                     android:id="@+id/fuel_brand"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Shell, "/>
 
                 <TextView
+                    style="@style/AppText"
                     android:id="@+id/fuel_octane"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -54,11 +58,13 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    style="@style/AppText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/price"/>
 
                 <TextView
+                    style="@style/AppText"
                     android:id="@+id/fuel_price"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -76,11 +82,13 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    style="@style/AppText"
                     android:text="@string/odometer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
 
                 <TextView
+                    style="@style/AppText"
                     android:id="@+id/odometer_reading"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -103,6 +111,7 @@
                     android:orientation="horizontal">
 
                     <TextView
+                        style="@style/LargeBoldText"
                         android:id="@+id/efficiency"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -110,6 +119,7 @@
                         android:text="25.6 "/>
 
                     <TextView
+                        style="@style/LargeBoldText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textStyle="bold"
@@ -118,6 +128,7 @@
                 </LinearLayout>
 
                 <TextView
+                    style="@style/PercentageText"
                     android:id="@+id/percentage"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -135,11 +146,13 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    style="@style/AppText"
                     android:text="@string/distance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
 
                 <TextView
+                    style="@style/AppText"
                     android:id="@+id/trip_distance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -157,12 +170,14 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    style="@style/AppText"
                     android:id="@+id/volume"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="9.64"/>
 
                 <TextView
+                    style="@style/AppText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text=" gallons"/>
@@ -178,11 +193,13 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    style="@style/AppText"
                     android:text="Cost/100 miles: "
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
 
                 <TextView
+                    style="@style/AppText"
                     android:id="@+id/hundred_mile_cost"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

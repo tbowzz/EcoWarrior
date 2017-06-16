@@ -23,13 +23,13 @@ public class Vehicle implements Serializable
     /**
      * For pulling from database
      */
-    public Vehicle(String vehicleId, int odometer, double distanceRecorded, double volumeRecorded, double averageEfficiency, double epaEstimate)
+    public Vehicle(String vehicleId, int odometer, double distanceRecorded, double volumeRecorded, double epaEstimate)
     {
         this.vehicleId = vehicleId;
         this.odometer = odometer;
         this.distanceRecorded = distanceRecorded;
         this.volumeRecorded = volumeRecorded;
-        this.averageEfficiency = averageEfficiency;
+        this.averageEfficiency = 0;
         this.recordedTrips = new ArrayList<>();
         this.epaEstimate = epaEstimate;
     }

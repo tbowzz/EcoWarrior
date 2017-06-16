@@ -19,6 +19,11 @@
     <string name="prompt_fuel_price">Fuel Price</string>
     <string name="title_activity_main2">Main2Activity</string>
 
+    <!--Add Vehicle Strings-->
+    <string name="add_vehicle">Add Vehicle</string>
+    <string name="vehicle_id">Vehicle Nickname</string>
+    <string name="epa_estimate">EPA MPG Estimate (Combined)</string>
+
     <!--Trips List Strings-->
     <string name="odometer">ODO: </string>
     <string name="distance">Trip Distance: </string>
@@ -31,7 +36,7 @@
 
     <!--Login Strings-->
     <string name="signed_in_fmt">Signed in as: %s</string>
-    <string name="login_as_fmt">Login as %s</string>
+    <string name="welcome_user_fmt">Welcome, %s</string>
     <string name="signed_in">Signed in</string>
     <string name="signing_in">Signing in…</string>
     <string name="signed_out">Signed out</string>
@@ -55,6 +60,8 @@
     <string name="disconnect">Disconnect</string>
     <string name="Enter">Enter</string>
     <string name="refresh_token">Get Fresh Token</string>
+    <string name="push_to_database">Push to Database</string>
+    <string name="pull_from_database">Pull from Database</string>
 
     <!-- Content Description for images -->
     <string name="desc_google_icon">Google Logo</string>

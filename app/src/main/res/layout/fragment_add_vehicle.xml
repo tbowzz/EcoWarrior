@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <!--vehicleId-->
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/vehicle_id_text"
+            android:inputType="textCapWords"
+            android:maxLines="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/vehicle_id"
+            android:imeOptions="actionNext"/>
+
+    </android.support.design.widget.TextInputLayout>
+
+    <!--odometer-->
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/odometer_reading"
+            android:inputType="number"
+            android:digits="0123456789."
+            android:maxLines="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/prompt_odometer_reading"
+            android:imeOptions="actionNext"/>
+
+    </android.support.design.widget.TextInputLayout>
+
+
+    <!--epaEstimate-->
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/epa_estimate"
+            android:inputType="number"
+            android:digits="0123456789."
+            android:maxLines="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/epa_estimate"
+            android:imeOptions="actionNext"/>
+
+    </android.support.design.widget.TextInputLayout>
+
+</LinearLayout>

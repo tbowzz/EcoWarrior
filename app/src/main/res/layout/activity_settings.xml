@@ -1,22 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:layout_gravity="center">
 
-    <TextView
-        android:id="@+id/hello_world_view"
+    <Button
+        android:id="@+id/pull_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Hello, World"/>
+        android:text="@string/pull_from_database"
+        android:layout_centerInParent="true"
+        android:theme="@style/ThemeOverlay.MyGreenButton" />
 
     <Button
-        android:id="@+id/settings_button"
-        android:layout_width="wrap_content"
+        android:id="@+id/push_button"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Useless Button"
-        android:layout_gravity="center"/>
+        android:text="@string/push_to_database"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/pull_button"
+        android:theme="@style/ThemeOverlay.MyGreenButton" />
 
-</LinearLayout>
+</RelativeLayout>

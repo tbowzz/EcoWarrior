@@ -1,7 +1,5 @@
 package com.ragnardev.ecowarrior.Model;
 
-import android.util.Log;
-
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -9,7 +7,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
-import com.ragnardev.ecowarrior.View.MainActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +19,7 @@ public class Data
 {
     private static final String TAG = "Data";
 
-    public static Data Instance = new Data();
+    public static Data SINGLETON = new Data();
 
     private List<Vehicle> vehicles;
 
@@ -34,35 +31,43 @@ public class Data
         vehicles = new ArrayList<>();
 
         //TODO: Fix for users with no vehicles yet
-        Vehicle focusst = new Vehicle("Ford Focus ST", 3150, 3049, 99, 24.4, 25);
+        Vehicle focusst = new Vehicle("Ford Focus ST", 3150, 3049, 99, 25);
         vehicles.add(focusst);
     }
 
-    public void initializeModel()
+    public void initializeModel(DataSnapshot dataSnapshot)
+    {
+        GenericTypeIndicator<List<Vehicle>> genericTypeIndicator =new GenericTypeIndicator<List<Vehicle>>(){};
+
+        List<Vehicle> fireBaseVehicles = dataSnapshot.child(currentUser.getUid() + "_" + currentUser.getDisplayName()).getValue(genericTypeIndicator);
+
+        if(fireBaseVehicles != null) this.setVehicles(fireBaseVehicles);
+    }
+
+    public void pullFromFirebase()
     {
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        // Attach a listener to read the data at our posts reference
         mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
                 GenericTypeIndicator<List<Vehicle>> genericTypeIndicator =new GenericTypeIndicator<List<Vehicle>>(){};
 
-                List<Vehicle> firebaseVehicles = dataSnapshot.getValue(genericTypeIndicator);
-                vehicles = firebaseVehicles;
+                List<Vehicle> fireBaseVehicles = dataSnapshot.child(currentUser.getUid() + "_" + currentUser.getDisplayName()).getValue(genericTypeIndicator);
+
+                if(fireBaseVehicles != null) setVehicles(fireBaseVehicles);
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-                System.out.println("The read failed: " + databaseError.getCode());
-            }
+            public void onCancelled(DatabaseError databaseError) {}
         });
     }
 
     public void pushToFirebase()
     {
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        mDatabase.setValue(vehicles);
+        mDatabase.child(currentUser.getUid() + "_" + currentUser.getDisplayName()).setValue(vehicles);
     }
 
     public List<Vehicle> getVehicles()
@@ -83,6 +88,11 @@ public class Data
     public void setVehicles(List<Vehicle> vehicles)
     {
         this.vehicles = vehicles;
+    }
+
+    public boolean addVehicle(Vehicle vehicle)
+    {
+        return vehicles.add(vehicle);
     }
 
     public FirebaseUser getCurrentUser()

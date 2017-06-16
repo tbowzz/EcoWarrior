@@ -18,7 +18,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -32,14 +31,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.ragnardev.ecowarrior.Model.Data;
-import com.ragnardev.ecowarrior.Model.Vehicle;
 import com.ragnardev.ecowarrior.R;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener,
         View.OnClickListener
@@ -98,7 +92,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(mGoogleApiClient != null && mGoogleApiClient.isConnected())
         {
-            Intent intent = MainActivity.newIntent(getApplicationContext());
+            Intent intent = TripsActivity.newIntent(getApplicationContext());
             startActivity(intent);
         }
     }
@@ -120,7 +114,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 break;
             case R.id.button_optional_action:
 //                startNextActivity();
-                Intent intent = MainActivity.newIntent(getApplicationContext());
+                Intent intent = TripsActivity.newIntent(getApplicationContext());
                 startActivity(intent);
                 break;
         }
@@ -162,9 +156,9 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
-                            Data.Instance.setCurrentUser(user);
-                            updateUI(user);
+                            Data.SINGLETON.setCurrentUser(user);
                             startNextActivity();
+                            updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
@@ -187,10 +181,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
             {
-                GenericTypeIndicator<List<Vehicle>> genericTypeIndicator =new GenericTypeIndicator<List<Vehicle>>(){};
-                List<Vehicle> vehicles = dataSnapshot.getValue(genericTypeIndicator);
-                if(vehicles != null) Data.Instance.setVehicles(dataSnapshot.getValue(genericTypeIndicator));
-                Intent intent = MainActivity.newIntent(getApplicationContext());
+                Data.SINGLETON.initializeModel(dataSnapshot);
+                Intent intent = TripsActivity.newIntent(getApplicationContext());
                 startActivity(intent);
                 optionalButton.setVisibility(View.VISIBLE);
             }
@@ -254,7 +246,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 //            mDetailTextView.setText(getString(R.string.firebase_status_fmt, user.getUid()));
             findViewById(R.id.sign_in_button).setVisibility(View.GONE);
             findViewById(R.id.sign_out_and_disconnect).setVisibility(View.VISIBLE);
-            optionalButton.setText(getString(R.string.login_as_fmt, user.getDisplayName()));
+            optionalButton.setText(getString(R.string.welcome_user_fmt, user.getDisplayName()));
         } else {
 //            mStatusTextView.setText(R.string.signed_out);
 //            mDetailTextView.setText(null);
