@@ -2,6 +2,9 @@ package com.ragnardev.ecowarrior.View;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
@@ -12,12 +15,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,8 +34,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.ragnardev.ecowarrior.Model.ClientModel;
 import com.ragnardev.ecowarrior.Model.Trip;
 import com.ragnardev.ecowarrior.Model.Vehicle;
+import com.ragnardev.ecowarrior.OBD.activity.MainActivity;
 import com.ragnardev.ecowarrior.R;
 
+import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -40,23 +48,26 @@ public class TripsActivity extends AppCompatActivity
 {
     private TripsPresenter presenter;
 
+    private static final String TAG = TripsActivity.class.getName();
     private static final String DIALOG_TRIP = "DialogTrip";
     private static final String DIALOG_VEHICLE = "DialogVehicle";
 
+//    Views
     private Toolbar mToolbar;
-
+    private TextView mUserNameTextView;
+    private TextView mUserEmailTextView;
+    private ImageView mUserPictureImageView;
     private FloatingActionButton mAddTripButton;
     private FloatingActionButton mAddVehicleButton;
     private FloatingActionsMenu mAddMenu;
-
-    private Vehicle currentVehicle;
-
+    private NavigationView mNavigationView;
     private DrawerLayout mDrawer;
     private RecyclerView vehicleRecyler;
     private ActionBarDrawerToggle mToggle;
-
     private RecyclerView tripsRecycler;
     private TripsAdapter mTripsAdapter;
+
+    private Vehicle currentVehicle;
 
     public static Intent newIntent(Context packageContext)
     {
@@ -74,16 +85,24 @@ public class TripsActivity extends AppCompatActivity
 
         presenter = new TripsPresenter(this);
 
+        //NAV VIEW INIT
+        mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+        onCreateNavMenu(mNavigationView.getMenu());
+        mNavigationView.setNavigationItemSelectedListener(this);
+
+        //HEADER INIT
+        View header=mNavigationView.getHeaderView(0);
+        mUserNameTextView = (TextView) header.findViewById(R.id.nav_user_name);
+        mUserNameTextView.setText(ClientModel.SINGLETON.getCurrentUser().getDisplayName());
+
+//        mUserEmailTextView = (TextView) header.findViewById(R.id.nav_email);
+//        mUserEmailTextView.setText(ClientModel.SINGLETON.getCurrentUser().getEmail());
+
+        new DownloadImageTask((ImageView) header.findViewById(R.id.nav_user_profile_pic))
+                .execute(ClientModel.SINGLETON.getCurrentUser().getPhotoUrl().toString());
+
+        //FAB INIT
         mAddMenu = (FloatingActionsMenu) findViewById(R.id.add_menu);
-        mAddMenu.setOnLongClickListener(new View.OnLongClickListener()
-        {
-            @Override
-            public boolean onLongClick(View v)
-            {
-                showAddTripDialog();
-                return false;
-            }
-        });
 
         mAddTripButton = (FloatingActionButton) findViewById(R.id.add_trip_button);
         mAddTripButton.setImageResource(R.drawable.gas_icon);
@@ -104,14 +123,10 @@ public class TripsActivity extends AppCompatActivity
             public void onClick(View view)
             {
                 showAddVehicleDialog();
-//                Snackbar.make(view, "Replace with AddVehicleActivity", Snackbar.LENGTH_LONG).setAction("Action", null).show();
             }
         });
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        //TODO: If no vehicle, prompt for creation
+        //if the user has no vehicle, prompt for creation
         if(ClientModel.SINGLETON.getVehicles().size() == 0)
         {
             Toast.makeText(this, "Since you have no vehicles, you must add one.", Toast.LENGTH_LONG).show();
@@ -133,11 +148,6 @@ public class TripsActivity extends AppCompatActivity
         mDrawer.setDrawerListener(mToggle);
         mToggle.syncState();
 
-        vehicleRecyler = (RecyclerView) findViewById(R.id.left_drawer);
-        vehicleRecyler.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
-        vehicleRecyler.setAdapter(new VehicleAdapter(ClientModel.SINGLETON.getVehicles()));
-
-
         LinearLayoutManager tripsLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, true);
         tripsLayoutManager.setStackFromEnd(true);
         tripsRecycler = (RecyclerView) findViewById(R.id.trips_recycler_view);
@@ -156,70 +166,6 @@ public class TripsActivity extends AppCompatActivity
         mTripsAdapter.notifyDataSetChanged();
         tripsRecycler.smoothScrollToPosition(currentVehicle.getRecordedTrips().size());
     }
-
-    //    ------------VEHICLE RECYCLER---------------------------------------------------
-    private class VehicleAdapter extends RecyclerView.Adapter<VehicleHolder>
-    {
-        private List<Vehicle> vehicles;
-
-        public VehicleAdapter(List<Vehicle> vehicles)
-        {
-            this.vehicles = vehicles;
-        }
-
-        @Override
-        public VehicleHolder onCreateViewHolder(ViewGroup parent, int viewType)
-        {
-            LayoutInflater layoutInflater = LayoutInflater.from(getApplicationContext());
-
-            View view = layoutInflater.inflate(R.layout.drawer_list_item, parent, false);
-
-            return new VehicleHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(VehicleHolder holder, int position)
-        {
-            Vehicle vehicle = vehicles.get(position);
-            holder.bindTrip(vehicle);
-        }
-        @Override
-        public int getItemCount()
-        {
-            return vehicles.size();
-        }
-    }
-    //    ------------VEHICLE INFO HOLDER---------------------------------------------------
-    private class VehicleHolder extends RecyclerView.ViewHolder implements View.OnClickListener
-    {
-        TextView vehicleId;
-
-        public VehicleHolder(View itemView)
-        {
-            super(itemView);
-
-            itemView.setOnClickListener(this);
-            vehicleId = (TextView) itemView.findViewById(R.id.vehicle_id_text);
-        }
-
-        public void bindTrip(Vehicle vehicle)
-        {
-            String id = vehicle.getVehicleId();
-            vehicleId.setText(id);
-        }
-
-        @Override
-        public void onClick(View v)
-        {
-            Toast.makeText(getApplicationContext(), "Vehicle " + vehicleId.getText() + " selected", Toast.LENGTH_SHORT).show();
-            setCurrentVehicle(ClientModel.SINGLETON.getVehicleById(vehicleId.getText().toString()));
-            mTripsAdapter.setRecordedTrips(currentVehicle.getRecordedTrips());
-            if(mTripsAdapter.getRecordedTrips() == null) mTripsAdapter.setRecordedTrips(new ArrayList<Trip>());
-            mTripsAdapter.notifyDataSetChanged();
-            mDrawer.closeDrawer(GravityCompat.START);
-        }
-    }
-//    ----------END VEHICLE RECYCLER------------------------------
 
     //    ------------TRIPS RECYCLER---------------------------------------------------
     private class TripsAdapter extends RecyclerView.Adapter<TripsHolder>
@@ -408,31 +354,44 @@ public class TripsActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu)
+    private void onCreateNavMenu(Menu menu)
     {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
+        final SubMenu vehiclesMenu = menu.addSubMenu("Vehicles");
+        final List<Vehicle> vehicles = ClientModel.SINGLETON.getVehicles();
+        for(int i = 0; i < vehicles.size(); i++)
+        {
+            Vehicle vehicle = vehicles.get(i);
+            final int j = i;
+            vehiclesMenu.add(vehicle.getVehicleId());
+            vehiclesMenu.getItem(i).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+            {
+                @Override
+                public boolean onMenuItemClick(MenuItem item)
+                {
+                    uncheckVehicles(vehiclesMenu);
+                    item.setChecked(true);
+                    navMenuItemClickHelper(j);
+                    return true;
+                }
+            });
+        }
+        vehiclesMenu.getItem(0).setChecked(true);
+    }
+    private void uncheckVehicles(SubMenu vehiclesMenu)
+    {
+        for(int i = 0; i < vehiclesMenu.size(); i++)
+        {
+            vehiclesMenu.getItem(i).setChecked(false);
+        }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
+    private void navMenuItemClickHelper(int j)
     {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings)
-        {
-            Intent i = new Intent(this, SettingsActivity.class);
-            startActivity(i);
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
+        currentVehicle = ClientModel.SINGLETON.getVehicles().get(j);
+        mTripsAdapter.setRecordedTrips(currentVehicle.getRecordedTrips());
+        if(mTripsAdapter.getRecordedTrips() == null) mTripsAdapter.setRecordedTrips(new ArrayList<Trip>());
+        mTripsAdapter.notifyDataSetChanged();
+        mDrawer.closeDrawer(GravityCompat.START);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -442,31 +401,21 @@ public class TripsActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-//        if (id == R.id.nav_camera)
-//        {
-//            // Handle the camera action
-//        }
-//        else if (id == R.id.nav_gallery)
-//        {
-//
-//        } else if (id == R.id.nav_slideshow)
-//        {
-//
-//        } else if (id == R.id.nav_manage)
-//        {
-//
-//        }
-        if (id == R.id.nav_share)
+        if(id == R.id.nav_obd)
         {
-
-        } else if (id == R.id.nav_send)
+            Intent obd = new Intent(this, MainActivity.class);
+            startActivity(obd);
+        }
+        if(id == R.id.nav_settings)
         {
-
+            Intent settings = new Intent(this, SettingsActivity.class);
+            startActivity(settings);
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
+
+
+        mDrawer.closeDrawer(GravityCompat.START);
+        return false;
     }
 
     public Vehicle getCurrentVehicle()
@@ -479,18 +428,29 @@ public class TripsActivity extends AppCompatActivity
         this.currentVehicle = currentVehicle;
     }
 
-    private class DrawerItemClickListener implements ListView.OnItemClickListener
+    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap>
     {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-        {
-            selectItem(position);
-        }
-    }
+        ImageView bmImage;
 
-    /** Swaps fragments in the main content view */
-    private void selectItem(int position)
-    {
-        //TODO: Change the current vehicle
+        public DownloadImageTask(ImageView bmImage) {
+            this.bmImage = bmImage;
+        }
+
+        protected Bitmap doInBackground(String... urls) {
+            String urldisplay = urls[0];
+            Bitmap mIcon11 = null;
+            try {
+                InputStream in = new java.net.URL(urldisplay).openStream();
+                mIcon11 = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            }
+            return mIcon11;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            bmImage.setImageBitmap(result);
+        }
     }
 }

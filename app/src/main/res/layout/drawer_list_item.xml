@@ -26,7 +26,7 @@
             android:layout_width="match_parent"
             android:gravity="center"
             android:textStyle="normal"
-            android:textSize="20dp"
+            android:textSize="20sp"
             android:layout_height="match_parent"
             android:text="Vehicle One"/>
 
