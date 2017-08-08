@@ -34,14 +34,15 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.ragnardev.ecowarrior.Model.ClientModel;
 import com.ragnardev.ecowarrior.Model.Trip;
 import com.ragnardev.ecowarrior.Model.Vehicle;
-import com.ragnardev.ecowarrior.OBD.activity.MainActivity;
 import com.ragnardev.ecowarrior.R;
 
 import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TripsActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener
@@ -401,11 +402,12 @@ public class TripsActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if(id == R.id.nav_obd)
-        {
-            Intent obd = new Intent(this, MainActivity.class);
-            startActivity(obd);
-        }
+        //TODO: If you want to re-add the obd portion, uncomment this and in activity_main_drawer
+//        if(id == R.id.nav_obd)
+//        {
+//            Intent obd = new Intent(this, MainActivity.class);
+//            startActivity(obd);
+//        }
         if(id == R.id.nav_settings)
         {
             Intent settings = new Intent(this, SettingsActivity.class);
