@@ -1,5 +1,6 @@
 package com.ragnardev.ecowarrior.View;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
@@ -53,6 +54,18 @@ public class SettingsActivity extends AppCompatActivity
             {
                 new FirebasePersistence().updateServer();
                 Snackbar.make(pushButton, "Pushed to Database", Snackbar.LENGTH_SHORT).show();
+            }
+        });
+
+        final Button logoutButton = (Button) findViewById(R.id.logout_button);
+        logoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ClientModel.SINGLETON.logout(getApplicationContext());
+                Snackbar.make(v, "You have successfully logged out.", Snackbar.LENGTH_SHORT).show();
+                finish();
+                Intent intent = new Intent(getApplicationContext(), SplashActivity.class);
+                startActivity(intent);
             }
         });
 

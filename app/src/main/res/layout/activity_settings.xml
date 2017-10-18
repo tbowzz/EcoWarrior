@@ -22,4 +22,13 @@
         android:layout_below="@id/pull_button"
         android:theme="@style/ThemeOverlay.MyGreenButton" />
 
+    <Button
+        android:id="@+id/logout_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/logout"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/push_button"
+        android:theme="@style/ThemeOverlay.MyGreenButton" />
+
 </RelativeLayout>

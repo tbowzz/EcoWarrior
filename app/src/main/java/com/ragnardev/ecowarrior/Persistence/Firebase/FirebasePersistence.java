@@ -21,11 +21,13 @@ import java.util.List;
 public class FirebasePersistence implements IPersistence
 {
     private DatabaseReference mDatabase;
-    private FirebaseUser currentUser;
+    private String currentUserUid;
+    private String currentUserDisplayName;
 
     public FirebasePersistence()
     {
-        this.currentUser = ClientModel.SINGLETON.getCurrentUser();
+        this.currentUserUid = ClientModel.SINGLETON.getUserUid();
+        this.currentUserDisplayName = ClientModel.SINGLETON.getUserDisplayName();
     }
 
     @Override
@@ -39,7 +41,7 @@ public class FirebasePersistence implements IPersistence
             {
                 GenericTypeIndicator<List<Vehicle>> genericTypeIndicator =new GenericTypeIndicator<List<Vehicle>>(){};
 
-                List<Vehicle> fireBaseVehicles = dataSnapshot.child(currentUser.getUid() + "_" + currentUser.getDisplayName()).getValue(genericTypeIndicator);
+                List<Vehicle> fireBaseVehicles = dataSnapshot.child(currentUserUid + "_" + currentUserDisplayName).getValue(genericTypeIndicator);
 
                 if(fireBaseVehicles != null)
                 {
@@ -62,6 +64,6 @@ public class FirebasePersistence implements IPersistence
     public void updateServer()
     {
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        mDatabase.child(currentUser.getUid() + "_" + currentUser.getDisplayName()).setValue(ClientModel.SINGLETON.getVehicles());
+        mDatabase.child(currentUserUid + "_" + currentUserDisplayName).setValue(ClientModel.SINGLETON.getVehicles());
     }
 }

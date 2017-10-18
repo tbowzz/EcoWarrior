@@ -27,11 +27,6 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.ragnardev.ecowarrior.Model.ClientModel;
 import com.ragnardev.ecowarrior.Persistence.Firebase.FirebasePersistence;
 import com.ragnardev.ecowarrior.Persistence.IPersistence;
@@ -68,16 +63,11 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Views
-//        mStatusTextView = (TextView) findViewById(R.id.status);
-//        mDetailTextView = (TextView) findViewById(R.id.detail);
-
         // Button listeners
         findViewById(R.id.sign_in_button).setOnClickListener(this);
         optionalButton = (Button) findViewById(R.id.button_optional_action);
         optionalButton.setOnClickListener(this);
         findViewById(R.id.sign_out_button).setOnClickListener(this);
-//        findViewById(R.id.enter_app_button).setOnClickListener(this);
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
@@ -99,9 +89,13 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     public void onStart() {
         super.onStart();
 
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(mGoogleApiClient != null && mGoogleApiClient.isConnected())
+        boolean existsSavedUser = ClientModel.SINGLETON.getSavedUser(getApplicationContext());
+
+        if(existsSavedUser)
         {
+            IPersistence persistence = new FirebasePersistence();
+            persistence.updateClientModel();
+
             Intent intent = TripsActivity.newIntent(getApplicationContext());
             startActivity(intent);
         }
@@ -151,7 +145,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         }
     }
 
-    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+    private void firebaseAuthWithGoogle(final GoogleSignInAccount acct) {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
         // [START_EXCLUDE silent]
         showProgressDialog();
@@ -166,13 +160,13 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
 
+                            acct.getIdToken();
                             FirebaseUser user = mAuth.getCurrentUser();
-                            ClientModel.SINGLETON.setCurrentUser(user);
+                            ClientModel.SINGLETON.saveCurrentUser(user, getApplicationContext());
 
                             IPersistence persistence = new FirebasePersistence();
                             persistence.updateClientModel();
 
-//                            startNextActivity();
                             updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.

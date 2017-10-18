@@ -94,13 +94,13 @@ public class TripsActivity extends AppCompatActivity
         //HEADER INIT
         View header=mNavigationView.getHeaderView(0);
         mUserNameTextView = (TextView) header.findViewById(R.id.nav_user_name);
-        mUserNameTextView.setText(ClientModel.SINGLETON.getCurrentUser().getDisplayName());
+        mUserNameTextView.setText(ClientModel.SINGLETON.getUserDisplayName());
 
 //        mUserEmailTextView = (TextView) header.findViewById(R.id.nav_email);
 //        mUserEmailTextView.setText(ClientModel.SINGLETON.getCurrentUser().getEmail());
 
-        new DownloadImageTask((ImageView) header.findViewById(R.id.nav_user_profile_pic))
-                .execute(ClientModel.SINGLETON.getCurrentUser().getPhotoUrl().toString());
+//        new DownloadImageTask((ImageView) header.findViewById(R.id.nav_user_profile_pic))
+//                .execute(ClientModel.SINGLETON.getCurrentUser().getPhotoUrl().toString());
 
         //FAB INIT
         mAddMenu = (FloatingActionsMenu) findViewById(R.id.add_menu);
@@ -128,6 +128,14 @@ public class TripsActivity extends AppCompatActivity
         });
 
         //if the user has no vehicle, prompt for creation
+        if(ClientModel.SINGLETON.getVehicles().size() != 0)
+        {
+            initializeRecyclers();
+        }
+    }
+
+    void onDatabaseSync()
+    {
         if(ClientModel.SINGLETON.getVehicles().size() == 0)
         {
             Toast.makeText(this, "Since you have no vehicles, you must add one.", Toast.LENGTH_LONG).show();
@@ -136,6 +144,7 @@ public class TripsActivity extends AppCompatActivity
         else
         {
             initializeRecyclers();
+            onCreateNavMenu(mNavigationView.getMenu());
         }
     }
 
@@ -355,7 +364,7 @@ public class TripsActivity extends AppCompatActivity
         }
     }
 
-    private void onCreateNavMenu(Menu menu)
+    void onCreateNavMenu(Menu menu)
     {
         final SubMenu vehiclesMenu = menu.addSubMenu("Vehicles");
         final List<Vehicle> vehicles = ClientModel.SINGLETON.getVehicles();
@@ -376,7 +385,7 @@ public class TripsActivity extends AppCompatActivity
                 }
             });
         }
-        vehiclesMenu.getItem(0).setChecked(true);
+        if(vehiclesMenu.size() > 0) vehiclesMenu.getItem(0).setChecked(true);
     }
     private void uncheckVehicles(SubMenu vehiclesMenu)
     {
@@ -428,6 +437,10 @@ public class TripsActivity extends AppCompatActivity
     public void setCurrentVehicle(Vehicle currentVehicle)
     {
         this.currentVehicle = currentVehicle;
+    }
+
+    public NavigationView getNavigationView() {
+        return mNavigationView;
     }
 
     private class DownloadImageTask extends AsyncTask<String, Void, Bitmap>

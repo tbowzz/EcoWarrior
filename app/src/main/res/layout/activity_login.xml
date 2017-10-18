@@ -10,6 +10,41 @@
               app:theme="@style/AppTheme.NoActionBar"
               tools:context=".View.LoginActivity">
 
+    <RelativeLayout
+        android:id="@+id/fullscreen_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/app_icon_view"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@mipmap/launcher_leaf"
+            android:layout_centerInParent="true"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="EcoWarrior"
+            android:layout_above="@id/app_icon_view"
+            android:layout_centerHorizontal="true"
+            style="@style/AppText"
+            android:textSize="30dp"
+            />
+
+        <!--Sign In Button-->
+        <com.google.android.gms.common.SignInButton
+            android:id="@+id/sign_in_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/app_icon_view"
+            android:layout_centerHorizontal="true"
+            android:visibility="visible"
+            tools:visibility="visible" />
+
+    </RelativeLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -48,15 +83,14 @@
             tools:text="Optional Action"
             tools:visibility="invisible"
         style="@style/Base.Widget.AppCompat.Button.Borderless.Colored"/>
-        <!--android:theme="@style/ThemeOverlay.MyGreenButton"-->
 
-        <!--Sign In Button-->
-        <com.google.android.gms.common.SignInButton
-            android:id="@+id/sign_in_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="visible"
-            tools:visibility="gone" />
+        <!--&lt;!&ndash;Sign In Button&ndash;&gt;-->
+        <!--<com.google.android.gms.common.SignInButton-->
+            <!--android:id="@+id/sign_in_button"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:visibility="visible"-->
+            <!--tools:visibility="visible" />-->
 
     </LinearLayout>
 
@@ -84,7 +118,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/sign_out"
+                android:text="@string/logout"
                 android:theme="@style/ThemeOverlay.MyGreenButton" />
 
             <!--<Button-->
