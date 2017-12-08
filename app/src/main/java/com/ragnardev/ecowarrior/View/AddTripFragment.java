@@ -130,8 +130,9 @@ public class AddTripFragment extends DialogFragment
     private void addNewTrip()
     {
         Trip newTrip = new Trip(odometer, tripDistance, fuelOctane, fuelBrand, fuelPrice, gallonsFilled);
-        ClientModel.SINGLETON.getVehicleById(mVehicle.getVehicleId()).addTrip(newTrip);
-        ClientModel.SINGLETON.getVehicleById(mVehicle.getVehicleId()).addNewFillupData(this.tripDistance, this.gallonsFilled);
+
+        // add the trip to the vehicle
+        ClientModel.SINGLETON.getVehicleById(mVehicle.getVehicleId()).addNewFillupData(newTrip);
 
         Toast.makeText(getContext(), "Trip added to " + mVehicle.getVehicleId(), Toast.LENGTH_SHORT).show();
 

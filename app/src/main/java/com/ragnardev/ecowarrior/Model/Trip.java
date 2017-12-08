@@ -29,7 +29,9 @@ public class Trip implements Serializable
         this.brand = brand;
         this.price = price;
         this.volume = volume;
+
         NumberFormat format = new DecimalFormat("#0.00");
+
         efficiency = Double.parseDouble(format.format(tripDistance / volume));
         this.costPerHundred = Double.parseDouble(format.format((100 / efficiency) * price));
     }

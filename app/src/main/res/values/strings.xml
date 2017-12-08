@@ -25,11 +25,11 @@
     <string name="epa_estimate">EPA MPG Estimate (Combined)</string>
 
     <!--Trips List Strings-->
-    <string name="odometer">ODO: </string>
+    <string name="odometer">Odometer: </string>
     <string name="distance">Trip Distance: </string>
     <string name="octane">Octane: </string>
     <string name="brand">Brand: </string>
-    <string name="price">Price: $</string>
+    <string name="price">Price: </string>
     <string name="volume">Gallons: </string>
     <string name="efficiency">MPG: </string>
     <string name="cost">Cost: </string>>

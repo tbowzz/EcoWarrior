@@ -22,9 +22,7 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,9 +38,7 @@ import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class TripsActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener
@@ -192,7 +188,7 @@ public class TripsActivity extends AppCompatActivity
         {
             LayoutInflater layoutInflater = LayoutInflater.from(getApplicationContext());
 
-            View view = layoutInflater.inflate(R.layout.trips_list_item, parent, false);
+            View view = layoutInflater.inflate(R.layout.trips_list_card, parent, false);
 
             return new TripsHolder(view);
         }
@@ -262,34 +258,26 @@ public class TripsActivity extends AppCompatActivity
         public void bindTrip(Trip trip)
         {
             holderTrip = trip;
-            String fuelType = trip.getBrand() + ", ";
-            String octane = Integer.toString(trip.getOctane());
-            String price = Double.toString(trip.getPrice());
-
-            String odo = " " + Integer.toString(trip.getOdometer());
-
             String mpg = Double.toString(trip.getEfficiency());
             double percentage = trip.getEfficiency() / currentVehicle.getEpaEstimate();
             String epaPercentage = formatPercentage(percentage);
-
-            String tripDist = " " + Double.toString(trip.getTripDistance());
-            String volume = Double.toString(trip.getVolume());
-
-            String costHundred = "$" + Double.toString(trip.getCostPerHundred());
-
-            this.fuelType.setText(fuelType);
-            fuelOctane.setText(octane);
-            fuelPrice.setText(price);
-
-            odometer.setText(odo);
+            String costHundred = formatCost(trip.getCostPerHundred());
+            String tripDist = " " + Double.toString(trip.getTripDistance()) + " miles";
+            String volume = " " + Double.toString(trip.getVolume());
+            String fuelType = trip.getBrand() + ", ";
+            String octane = Integer.toString(trip.getOctane()) + " octane";
+            String price = formatCost(trip.getPrice());
+            String odo = " " + Integer.toString(trip.getOdometer()) + " miles";
 
             this.mpg.setText(mpg);
             this.epaPercentage.setText(epaPercentage);
-
+            this.costHundred.setText(costHundred);
             tripDistance.setText(tripDist);
             this.volume.setText(volume);
-
-            this.costHundred.setText(costHundred);
+            this.fuelType.setText(fuelType);
+            fuelOctane.setText(octane);
+            fuelPrice.setText(price);
+            odometer.setText(odo);
         }
 
         private String formatPercentage(double original)
@@ -310,6 +298,13 @@ public class TripsActivity extends AppCompatActivity
 
                 return "-" + format.format(percentage) + "%";
             }
+        }
+
+        private String formatCost(double original)
+        {
+            NumberFormat format = new DecimalFormat("#0.00");
+
+            return " $" + format.format(original);
         }
 
         @Override
